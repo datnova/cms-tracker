@@ -1,0 +1,35 @@
+[yolo]
+model = "./modelYOLO/best-car-300.pt"
+tracker = "./customTracker.yaml"      # optional, default ./bytetrack.yaml
+persist = true                        # optional, default false
+conf = 0.7                            # optional, default 0.7
+classes = [0]                         # optional, default [0]
+
+[screens.alpha]
+source = "http://220.254.72.200/nphMotionJpeg?Resolution=640x640&Quality=Standard"
+scale = 1.0                                                                        # optional, default 1
+
+[screens.alpha.filter.fps]
+index = 0
+
+[screens.alpha.filter.trailBalls] # require [yolo]
+index = 1
+maxBalls = 30     # optional, default 30
+ballThickness = 5 # optional, default 5
+
+[screens.alpha.filter.stopBoxes] # require [yolo]
+index = 2
+stopTime = 5                   # optional, default 5s 
+triggerColor = [56, 26, 211]   # optional, color set by format [Blue Green Red]
+neutralColor = [128, 128, 128] # optional, color set by format [Blue Green Red]
+
+# [screens.alpha.record] # optional
+# output = "haha.mp4"
+# fps = 30               # optional, default 24
+# fourcc = "mp4v"        # optional, default "XVID"
+
+[screen.beta.filter.fps]
+index = 0
+
+[screens.beta] # if need another screen
+source = "rtsp://192.168.1.105:554/user=admin&password=&channel=2&stream=0.sdp?"
