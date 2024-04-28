@@ -28,8 +28,5 @@ neutralColor = [128, 128, 128] # optional, color set by format [Blue Green Red]
 # fps = 30               # optional, default 24
 # fourcc = "mp4v"        # optional, default "XVID"
 
-[screen.beta.filter.fps]
-index = 0
-
-[screens.beta] # if need another screen
-source = "rtsp://192.168.1.105:554/user=admin&password=&channel=2&stream=0.sdp?"
+# [screens.beta] # if need another screen
+# source = "rtsp://192.168.1.105:554/user=admin&password=&channel=2&stream=0.sdp?"
