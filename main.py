@@ -16,6 +16,8 @@ def main():
 
     app.run(True)
 
+    app.capture_thread.join()
+    app.display_thread.join()
 
 if __name__ == "__main__":
     main()

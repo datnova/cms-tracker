@@ -36,8 +36,8 @@ class Screen:
             int(self._captureSource.get(4) * self._scale),
         )
         self._lastTimeUpdate: float = time()
-        self._originScreenBuffer: MatLike = empty(self._resolution)
-        self._filterScreenBuffer: MatLike = empty(self._resolution)
+        self._originScreenBuffer: MatLike = empty(list(self._resolution[::-1]) + [3])
+        self._filterScreenBuffer: MatLike = empty(list(self._resolution[::-1]) + [3])
         self._fourcc: int = VideoWriter.fourcc(*fourcc)
         self._recordFPS: int = fps
         self._outSource: Optional[VideoWriter] = (
@@ -108,7 +108,7 @@ class Screen:
         self.update()
         self.displayScreen(windowName, origin) if display else None
 
-    def displayScreen(self, windowName: str, origin: bool):
+    def displayScreen(self, windowName: str, origin: bool = False):
         frame = self._originScreenBuffer if origin else self._filterScreenBuffer
         imshow(windowName, frame)
 
@@ -117,7 +117,7 @@ class Screen:
         if not ret:
             return ret
         self._originScreenBuffer = resize(self._originScreenBuffer, self._resolution)
-        self._filterScreenBuffer = self._originScreenBuffer
+        # self._filterScreenBuffer = self._originScreenBuffer
         return ret
 
     def getQImage(self, origin: bool = True) -> QImage:
@@ -131,8 +131,9 @@ class Screen:
         self._filterFuncs.append((filter, kwargs))
 
     def applyFilter(self):
+        self._filterScreenBuffer = self._originScreenBuffer.copy()
         for func, params in self._filterFuncs:
-            self.filterScreenBuffer = func(self.filterScreenBuffer, **params)
+            self._filterScreenBuffer = func(self._filterScreenBuffer, **params)
 
     def close(self):
         if self._outSource:

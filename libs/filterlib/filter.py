@@ -21,10 +21,11 @@ class FilterLib:
         conf: float = getDictV(yoloConfig, "conf", 0.7)
         persist: bool = getDictV(yoloConfig, "persist", False)
         classes: list = getDictV(yoloConfig, "classes", [0])
+        tracker: str = getDictV(yoloConfig, "tracker", "bytetrack.yaml")
 
         self._yoloModel = YoloDecLib(
             modelPath=yoloConfig["model"],
-            yoloTracker=str(yoloConfig["tracker"]),
+            yoloTracker=tracker,
             persist=persist,
             conf=conf,
             classes=classes,
@@ -50,7 +51,8 @@ class FilterLib:
     def displayFPS(self, frame: MatLike) -> MatLike:
         oldTime: float = self._lastUpdateTime
         self._lastUpdateTime = time()
-        fps = 1 / (self._lastUpdateTime - oldTime)
+        delay = (self._lastUpdateTime - oldTime)
+        fps = 1 / delay if delay > 0 else 0
         text = f"FPS: {fps:.2f}"
         color = (0, 0, 255)
         position = (frame.shape[1] - 10 - len(text) * 20, frame.shape[0] - 10)

@@ -2,7 +2,7 @@ from libs.filterlib.filter import FilterLib
 from libs.screenlib.screen import Screen
 from cv2 import destroyAllWindows, waitKey
 from libs.utilslib import getDictV
-
+import threading
 
 class App:
     screens: list[Screen] = list()
@@ -11,6 +11,10 @@ class App:
     def __init__(self, configData: dict):
         self.configData = configData
         self.setupScreens()
+        self._running = False
+
+        self.capture_thread = threading.Thread(target=self.captureThread)
+        self.display_thread = threading.Thread(target=self.displayThread)
 
     def setupScreens(self):
         for k, v in self.configData["screens"].items():
@@ -77,11 +81,30 @@ class App:
         screen.setupOutSource(output, fourcc, fps)
 
     def run(self, display=False):
-        while True:
-            for screen in self.screens:
-                screen.run(screen.name, display=display)
+        if not display:
+            return 
 
-            if waitKey(1) & 0xFF == ord("q"):
-                break
+        self._running = True
+        self.capture_thread.start()
+        self.display_thread.start()
+
+    def captureThread(self):
+        while self._running:
+            for screen in self.screens:
+                screen.getNextFrame()
+
+        for screen in self.screens:
+            screen.close()
 
         destroyAllWindows()
+
+    def displayThread(self):
+        while self._running:
+            for screen in self.screens:
+                screen.applyFilter()
+                screen.displayScreen(screen.name)
+
+            if waitKey(1) & 0xFF == ord('q'):
+                self._running = False
+                break
+

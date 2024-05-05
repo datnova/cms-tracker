@@ -5,10 +5,11 @@ from random import sample
 from time import time
 
 from ultralytics import YOLO
+from ultralytics.engine.model import Model
 from ultralytics.utils.plotting import Annotator
 
 from cv2.typing import MatLike
-from cv2 import polylines
+from cv2 import ellipse2Poly, polylines, resize
 
 from numpy import hstack, int32
 
@@ -122,16 +123,7 @@ class YoloDecLib:
         track.append((cx, cy))
         track.pop(0) if len(track) > self._maxBallTrack else None
 
-    def update(self, frame: MatLike) -> MatLike:
-        results = self._model.track(
-            source=frame,
-            persist=self._persist,
-            tracker=self._yoloTracker,
-            verbose=False,
-            conf=self._conf,
-            classes=self._classes,
-        )
-
+    def _persistAdditionalHandle(self, results: list):
         try:
             self._currentBoxes = results[0].boxes.xyxy.cpu()
             self._currentIDs = results[0].boxes.id.int().cpu().tolist()
@@ -155,9 +147,29 @@ class YoloDecLib:
                     self._centerPoints[id][1] = time()
 
         except AttributeError:
-            print("Dont detect any object in frame, skip.")
             self._currentBoxes = list()
             self._currentIDs = list()
+
+    def update(self, frame: MatLike) -> MatLike:
+        if self._persist:
+            results: list = self._model.track(
+                source=frame,
+                persist=self._persist,
+                tracker=self._yoloTracker,
+                verbose=False,
+                conf=self._conf,
+                classes=self._classes,
+            )
+
+            self._persistAdditionalHandle(results)
+        else:
+            results: list = self._model.predict(
+                source=frame,
+                verbose=False,
+                conf=self._conf,
+                classes=self._classes,
+            )
+            frame = results[0].plot()
 
         return frame
 
