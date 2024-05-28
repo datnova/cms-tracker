@@ -6,7 +6,7 @@ foo@bar:~$ pip install -r requirements
 ```
 
 ## Run
-```
+```console
 foo@bar:~$ python main.py
 ```
 
