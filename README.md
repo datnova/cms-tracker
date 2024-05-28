@@ -1,6 +1,16 @@
 # cms-tracker
-## Command
 
+##  Install requirements
+```console
+foo@bar:~$ pip install -r requirements
+```
+
+## Run
+```
+foo@bar:~$ python main.py
+```
+
+## Convert pt to onnx
 ```console
 foo@bar:~$ yolo export model=yolov8s.pt format=onnx optimize=True half=True simplify=True
 ```
